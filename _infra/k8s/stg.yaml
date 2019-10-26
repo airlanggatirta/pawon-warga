@@ -1,0 +1,24 @@
+configMap:
+  mountPath: /opt/pawon-warga/params
+
+app:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 200m
+      memory: 1Gi
+
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+
+  tls:
+    - hosts:
+        - pawon-warga.ktbs.xyz
+
+  hosts:
+    - host: pawon-warga.ktbs.xyz
+      path:
+        - "/"
