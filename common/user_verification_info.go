@@ -1,6 +1,6 @@
 package common
 
-import "github.com/kitabisa/pawon-warga/model"
+import "github.com/airlanggatirta/pawon-warga/model"
 
 func GetVerificationInfo(user model.User) (verificationStatus bool, verificationBadge string) {
 	if user.VerificationStatus == "VERIFIED" {

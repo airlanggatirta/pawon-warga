@@ -4,7 +4,7 @@ import (
 	"fmt"
 
    	"github.com/spf13/cobra"
-	"github.com/kitabisa/pawon-warga/version"
+	"github.com/airlanggatirta/pawon-warga/version"
 )
 
 // versionCmd represents the version command

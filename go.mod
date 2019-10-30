@@ -1,12 +1,11 @@
 module github.com/airlanggatirta/pawon-warga
 
 require (
-	github.com/sirupsen/logrus v1.4.2
-	github.com/spf13/cobra v0.0.5
-	github.com/spf13/viper v1.4.0
 	github.com/aws/aws-sdk-go v1.25.22
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.16.0 // indirect
+	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gojektech/heimdall v5.0.2+incompatible
 	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible
