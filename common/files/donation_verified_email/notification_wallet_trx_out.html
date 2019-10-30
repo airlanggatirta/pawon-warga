@@ -1,0 +1,50 @@
+<p>Hi {{ .FullName }},</p>
+
+<p>Ini adalah notifikasi transaksi Dompet Kitabisa Anda:</p>
+
+<table cellspacing="0" cellpadding="10" border="0">
+    <tr>
+        <td align="left" valign="top" width="100">
+            <strong>ID Transaksi</strong>
+        </td>
+        <td align="left" valign="top" width="400">
+            : {{ .TrxID }}
+        </td>
+    </tr>
+    <tr>
+        <td align="left" valign="top">
+            <strong>Jenis</strong>
+        </td>
+        <td align="left" valign="top">
+            : {{ .Flow }}
+        </td>
+    </tr>
+    <tr>
+        <td align="left" valign="top">
+            <strong>Jumlah</strong>
+        </td>
+        <td align="left" valign="top">
+            : {{ .Amount }}
+        </td>
+    </tr>
+    <tr>
+        <td align="left" valign="top">
+            <strong>Deskripsi</strong>
+        </td>
+        <td align="left" valign="top">
+            : {{ .Description }}
+        </td>
+    </tr>
+    <tr>
+        <td align="left" valign="top">
+            <strong>Waktu Transaksi</strong>
+        </td>
+        <td align="left" valign="top">
+            : {{ .Created }}
+        </td>
+    </tr>
+</table>
+<p>
+    Silakan cek informasi selengkapnya <a href="{{ .WalletLink }}">disini</a>
+</p>
+<p><em>Jika Anda tidak mengenali transaksi ini, segera hubungi Tim Support kami di support@kitabisa.com</em></p>

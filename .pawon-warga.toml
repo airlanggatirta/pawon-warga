@@ -1,0 +1,439 @@
+[app]
+name = "pawon-warga"
+version = "0.0.1"
+host = "0.0.0.0"
+port = 8080
+
+[database]
+host = "localhost"
+port = 3306
+username = "admin"
+password = "asdf1234"
+name = "kitabisa"
+additional_parameters = "charset=utf8&parseTime=True&loc=Asia%2fJakarta&time_zone=%27%2B07%3A00%27"
+max_open_connection = 280
+max_idle_connection = 20
+connection_max_lifetime = "0s"
+
+[cache]
+host = "localhost"
+port = 6379
+dial_connect_timeout = "5s"
+read_timeout = "5s"
+write_timeout = "5s"
+max_idle = 700
+max_active = 1000
+idle_timeout = "60s"
+wait = true
+max_conn_lifetime = "0s"
+namespace = "1"
+password = ""
+
+    [cache.items.session]
+    prefix = "session"
+    ttl = "1m"
+
+    [cache.items.otp]
+    prefix = "otp"
+    ttl = "15m"
+
+    [cache.items.get_all_lovelist_service]
+    prefix = "all-lovelist"
+    ttl = "1m"
+
+    [cache.items.temp_email_registration]
+    prefix = "no-key"
+    ttl = "48h"
+
+    [cache.items.temp_wa_registration]
+    prefix = "no-key"
+    ttl = "900s"
+
+    [cache.items.get_all_banner]
+    prefix = "all-banner"
+    ttl = "15m"
+
+    [cache.items.get_love_lists]
+    prefix = "lovelist:getbyuser"
+    ttl = "60s"
+
+    [cache.items.get_all_user_lovelist]
+    prefix = "lovelist:allinid"
+    ttl = "720h"
+
+    [cache.items.get_all_users]
+    prefix = "all-users"
+    ttl = "2s"
+
+    [cache.items.get_one_user]
+    prefix = "user"
+    ttl = "2s"
+
+    [cache.items.get_one_user_by_secondary_id]
+    prefix = "user:secondary_id"
+    ttl = "2s"
+
+    [cache.items.get_one_user_by_credentials]
+    prefix = "user:credentials"
+    ttl = "2s"
+
+    [cache.items.get_one_user_by_email]
+    prefix = "user:email"
+    ttl = "2s"
+
+    [cache.items.get_one_user_by_whatsapp]
+    prefix = "user:whatsapp"
+    ttl = "2s"
+
+    [cache.items.get_user_registration_temp]
+    prefix = "registration"
+    ttl = "2s"
+
+    [cache.items.get_search_user]
+    prefix = "search-user"
+    ttl = "10s"
+
+    [cache.items.get_all_categories]
+    prefix = "all-categories-page"
+    ttl = "30s"
+
+    [cache.items.get_one_campaign_category]
+    prefix = "one-campaign-category"
+    ttl = "168h"
+
+    [cache.items.get_all_campaign_report]
+    prefix = "all-campaign-reports"
+    ttl = "5m"
+
+    [cache.items.get_one_campaign_report]
+    prefix = "campaign-report"
+    ttl = "15m"
+
+    [cache.items.get_donation_list_by_campaign]
+    prefix = "donation_list_by_campaign"
+    ttl = "30s"
+
+    [cache.items.get_donation_list_by_user]
+    prefix = "donation_list_by_user"
+    ttl = "7s"
+
+    [cache.items.get_donation_list_by_user_range]
+    prefix = "donation_list_by_user_range"
+    ttl = "7s"
+
+    [cache.items.get_donated_campaign_id]
+    prefix = "donated_campaign_id"
+    ttl = "1m"
+
+    [cache.items.get_total_donation_by_month]
+    prefix = "total_donation"
+    ttl = "10s"
+
+    [cache.items.get_all_donation_status]
+    prefix = "all_donation_status"
+    ttl = "3h"
+
+    [cache.items.get_all_donated_campaign_id]
+    prefix = "all-donated-campaign"
+    ttl = "10s"
+
+    [cache.items.get_campaign_id_by_short_url]
+    prefix = "campaign_id_by_short-url"
+    ttl = "15s"
+
+    [cache.items.get_all_campaign]
+    prefix = "all_campaign"
+    ttl = "1m"
+
+    [cache.items.get_one_campaign]
+    prefix = "campaign"
+    ttl = "60s"
+
+    [cache.items.fundraiser_list]
+    prefix = "fundraiser_list"
+    ttl = "10s"
+
+    [cache.items.jenius_trx]
+    prefix = "no-key"
+    ttl = "10m"
+
+    [cache.items.get_all_home_banner]
+    prefix = "all-home-banner"
+    ttl = "15m"
+
+    [cache.items.flag_assignment_model_id]
+    prefix = "flag-assignment-model-id"
+    ttl = "10s"
+
+    [cache.items.get_all_curated_update]
+    prefix = "curated-update"
+    ttl = "10s"
+
+    [cache.items.get_campaign_update_by_campaign_id]
+    prefix = "all-campaign-updates-by-campaign-id"
+    ttl = "15m"
+
+    [cache.items.get_one_flag_by_ref_model_and_flagname]
+    prefix = "flag"
+    ttl = "10s"
+
+    [cache.items.get_one_partner]
+    prefix = "partner"
+    ttl = "5s"
+
+    [cache.items.get_wallet_balance]
+    prefix = "wallet:balance"
+    ttl = "10s"
+
+    [cache.items.get_wallet_topup_status]
+    prefix = "wallet:topup-status"
+    ttl = "5s"
+
+    [cache.items.get_all_wallet_transaction_type]
+    prefix = "all_wallet_transaction_type"
+    ttl = "60s"
+
+    [cache.items.get_all_campaign_status]
+    prefix = "all_campaign_status"
+    ttl = "3h"
+
+    [cache.items.get_all_user_status]
+    prefix = "all-user-status"
+    ttl = "30m"
+
+    [cache.items.get_one_user_status]
+    prefix = "user-status"
+    ttl = "30m"
+
+    [cache.items.get_all_location]
+    prefix = "all-location"
+    ttl = "24h"
+
+    [cache.items.get_one_location]
+    prefix = "location"
+    ttl = "24h"
+
+    [cache.items.get_all_payment_method]
+    prefix = "all-payment-methods"
+    ttl = "24h"
+
+    [cache.items.get_one_payment_method]
+    prefix = "payment-method"
+    ttl = "24h"
+
+    [cache.items.get_all_privilege]
+    prefix = "all-privilege"
+    ttl = "15m"
+
+    [cache.items.get_one_privilege]
+    prefix = "privilege"
+    ttl = "15m"
+
+    [cache.items.get_gold_price]
+    prefix = "goldprice"
+    ttl = "1h"
+
+    [cache.items.get_all_campaign_updates]
+    prefix = "all-campaign-updates"
+    ttl = "72h"
+
+    [cache.items.get_wallet_transaction]
+    prefix = "wallet:transaction"
+    ttl = "10s"
+
+    [cache.items.registration_otp_flag]
+    prefix = "registration-otp-flag"
+    ttl = "5m"
+
+    [cache.items.get_one_user_by_email_without_filter]
+    prefix = "user:whatsapp-nofilter"
+    ttl = "2s"
+
+    [cache.items.get_one_user_by_whatsapp_without_filter]
+    prefix = "user:whatsapp-nofilter"
+    ttl = "2s"
+
+    [cache.items.get_one_campaign_service]
+    prefix = "campaign-service"
+    ttl = "60s"
+
+    [cache.items.get_wallet_balance_service]
+    prefix = "wallet:balance:service"
+    ttl = "10s"
+
+    [cache.items.get_campaigner_public]
+    prefix = "public:campaigner"
+    ttl = "10m"
+
+    [cache.items.get_user_supported_campaign_public]
+    prefix = "public:supported_campaign"
+    ttl = "10m"
+
+    [cache.items.get_campaign_category_id_by_slug]
+    prefix = "campaign_category_id_by_slug"
+    ttl = "15s"
+
+    [cache.items.get_access_token_sangu]
+    prefix = "sangu:access_token"
+    ttl = "2h"
+
+    [cache.items.get_campaign_gdv]
+    prefix = "campaign-gdv"
+    ttl = "10m"
+
+    [cache.items.get_campaign_detail_simple]
+    prefix = "campaign-detail-simple"
+    ttl = "1m"
+
+    [cache.items.otp_disbursement]
+    prefix = "otp-disbursement"
+    ttl = "2m"
+
+    [cache.items.send_otp_limit]
+    prefix = "send-otp"
+    ttl = "15s"
+
+[jwt]
+sign_key = "BMbak0BwP3GgKoxRPVOk"
+secret_key = "dF66ywyYvcOE50vtCqhG"
+issuer = "https://kitabisa.com"
+
+[hmac_signature]
+secret_key = "7f0e70463be1528e2ef2931ac9400f47aabd9198ceb553b1c2eedff42934fff4"
+
+[ktbs_header]
+exclude_mobile_header_check = ["sekawan"] # these client-name will be excluded from mobile header
+
+[email]
+header = "common/files/email/header.html"
+footer = "common/files/email/footer.html"
+
+[firebase]
+credential_path = "kitabisa-staging.json"
+
+[users]
+token_ttl = "20160m"
+activation_url = "http://localhost:8080/activation"
+reset_password_link = "http://localhost:8080/forgot-password/reset"
+activation_key_salt = "salt"
+
+    [users.activation_email]
+    content = "common/files/email/registration.html"
+
+    [users.reset_password_request_email]
+    content = "common/files/email/reset_password_request.html"
+
+[ses]
+region = "us-east-1"
+key = "AKIAJC427LPHEMP5EBKA"
+secret = "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"
+mail_sender = "support@kitabisa.com"
+
+[otp]
+host = "https://wa.staging.ktbs.io/v1/messages/hsm"
+verify_number_url = "https://wa.staging.ktbs.io/v1/contacts"
+username = "ktbs_xyz"
+password = "bEWG9207v28ikg9YJxrv6134FXS6Vhc5gH3FLzRE"
+
+[otpdisbursement]
+max_retry = 0
+max_request = 0
+
+[zakat]
+rice_price = 10000
+gold_price = 586927
+
+[customerio]
+site_id = "f2bb1594b6533782949b"
+api_key = "d0f53c4fab90a048559c"
+customer_endpoint = "https://track.customer.io/api/v1/customers"
+customer_id_prefix = "production_"
+
+[sns]
+key= "AKIAIQF37AVRWAICIYMQ"
+secret= "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"
+region= "ap-southeast-1"
+sns_sms_service_topic_arn= "arn:aws:sns:ap-southeast-1:922910427931:notif-sms-test"
+
+[donations]
+    [donations.campaigner_notification_get_donation]
+    content = "common/files/donation_verified_email/notification_to_campaigner.html"
+    [donations.donor_notification_wallet]
+    content = "common/files/donation_verified_email/notification_wallet_trx_out.html"
+
+[link]
+base_url = "https://kitabisa.com"
+assets_url = "https://assets.kitabisa.com"
+new_assets_url = "https://assets.kitabisa.cc"
+
+[sangu]
+sangu_base_url = "https://sangu.ktbs.xyz"
+sangu_username = "super"
+sangu_password = "superLah"
+sangu_get_token_endpoint = "oauth/token?grant_type=client_credentials"
+sangu_create_trx_endpoint = "va/create"
+
+    [sangu.jenius]
+    create_trx_endpoint = "pay/create"
+    callback = "https://kitabisa-api.ktbs.xyz/callback/payment/jenius"
+
+    [sangu.gopay]
+    create_trx_endpoint = "pay/create"
+    callback = "https://kitabisa-api.ktbs.xyz/callback/payment/gopay"
+
+    [sangu.va]
+    create_trx_endpoint = "va/create"
+    callback = "https://kitabisa-api.ktbs.xyz/callback/payment/va"
+    expired = "6h"
+
+    [sangu.linkaja]
+    create_trx_endpoint = "pay/create"
+    callback = "https://kitabisa-api.ktbs.xyz/callback/payment/linkaja"
+    minimum_amount=10000
+
+    [sangu.dana]
+    create_trx_endpoint = "pay/create"
+    callback = "https://kitabisa-api.ktbs.xyz/callback/payment/dana"
+    minimum_amount=100
+
+[cloudsearch]
+region = "ap-southeast-1"
+search_endpoint = "search-kitabisadev-cdknphoqcqeoq4yoihlt6bz3b4.ap-southeast-1.cloudsearch.amazonaws.com"
+key = "AKIAIQF37AVRWAICIYMQ"
+secret = "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"
+
+[midtrans]
+server_key = "SB-Mid-server-2CY_Jz8l6TYo1mA3wmgDJvqq"
+client_key = "SB-Mid-client-_2k7rj-HJVkz7Nm1"
+env_type = "sandbox"
+deeplink_donation = "ktbs://donation/summary"
+deeplink_zakat = "ktbs://zakat/summary"
+donate_base_url = "https://donate.kitabisa.com"
+
+[clevertap]
+base_url = "https://api.clevertap.com"
+account_id = "TEST-RK8-869-R55Z"
+passcode = "EHE-KIV-MPKL"
+
+[imagine]
+base_url = "http://staging.ktbs.io:8087/v1/images/"
+username = "staging"
+password = "gnigats"
+image_endpoint = "https://img.staging.kitabisa.cc"
+
+[imgix]
+image_endpoint = "https://imgix.kitabisa.xyz"
+
+[santet]
+base_url = "http://santet.ktbs.xyz"
+basic_auth_toggle = true
+basic_auth_username = "68747470733A2F2F73616E7465742E6B7462732E78797A7764E1AC4A5973616F1A5190AEBB0450"
+basic_auth_password = "68747470733A2F2F73616E7465742E6B7462732E78797A851C4317000348A22C005EA64F09AEBA"
+
+[urunan]
+base_url = "http://bisasehat.ktbs.xyz"
+toggle = true
+app_id = "urunan"
+key = "2j4h8hd8467d210ew28732ghwy8236ewb328refg843g8bdeb8h9ehx"
+campaign_id = "115501"
+trx_type = "kitabisa"

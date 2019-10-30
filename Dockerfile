@@ -2,7 +2,7 @@ FROM kitabisa/debian-base-image:latest
 
 ARG GIT_COMMIT
 ARG VERSION
-LABEL REPO="https://github.com/kitabisa/pawon-warga"
+LABEL REPO="https://github.com/airlanggatirta/pawon-warga"
 LABEL GIT_COMMIT=$GIT_COMMIT
 LABEL VERSION=$VERSION
 

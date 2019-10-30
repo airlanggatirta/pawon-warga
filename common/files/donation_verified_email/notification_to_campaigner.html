@@ -1,0 +1,19 @@
+Hai {{ .FullName }},<br/><br/>
+
+{{ .ParentCampaignWording }} <a href="{{ .CampaignURL }}">{{ .CampaignTitle }}</a> dengan detail berikut:<br/><br/>
+
+<b>Nama</b>: {{ .Donor }}<br/>
+<b>Nominal</b>: {{ .Amount }}<br/>
+<b>Komentar</b>: {{ .Comment }}<br/><br/>
+
+Semoga donasi ini memberikan kemudahan dan manfaat. <br/><br/>
+
+{{ if .ParentCampaignURL }}
+Dana yang didapatkan secara otomatis akan disalurkan ke Campaign Induk <a href="{{ .ParentCampaignURL }}">{{ .ParentCampaignTitle }}</a> . <br/><br/>
+Terimakasih telah menjadi bagian dari #OrangBaik dan membantu mempublikasikan Campaign <a href="{{ .ParentCampaignURL }}">{{ .ParentCampaignTitle }}</a>. <br/><br/>
+{{ end }}
+
+
+Kunjungi <a href="https://help.kitabisa.com/">Kitabisa Help Center</a> untuk pertanyaan seputar tips penggalangan dana dan petunjuk berdonasi.<br/><br/>
+
+Apabila Anda ingin berhenti menerima notifikasi ini, klik <a href="{{ .UnsubscribeURL }}">di sini</a>.

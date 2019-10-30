@@ -1,10 +1,22 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"os"
+	"os/signal"
 
+	"github.com/gomodule/redigo/redis"
+	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
+	"github.com/airlanggatirta/pawon-warga/common"
+	"github.com/mitchellh/go-homedir"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/rs/cors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/urfave/negroni"
 )
 
 var cfgFile string
@@ -12,16 +24,16 @@ var cfgFile string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "pawon-warga",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Admin management system on pawon",
+	Long: `The direct user of pawon is the admin of kitabisa website. Previously on Aurum
+the admin is also user of kitabisa. This time we make it a bit 
+different by separating the administration system between admin 
+kitabisa user.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		InitApp()
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -36,7 +48,275 @@ func Execute() {
 func init() {
 	cobra.OnInitialize()
 
+	// Here you will define your flags and configuration settings.
+	// Cobra supports persistent flags, which, if defined here,
+	// will be global for your application.
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.github.com/airlanggatirta/pawon-warga.toml)")
+
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+// initConfig reads in config file and ENV variables if set.
+func initConfig() {
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFile)
+	} else {
+		// Find home directory.
+		home, err := homedir.Dir()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		// Search config in home directory with name ".pawon-warga" (without extension).
+		viper.AddConfigPath(".")
+		viper.AddConfigPath(home)
+		viper.AddConfigPath("./params")
+		viper.AddConfigPath("/opt/pawon-warga/bin")
+		viper.AddConfigPath("/opt/pawon-warga/bin/params")
+		viper.AddConfigPath("/etc/pawon-warga")
+		viper.AddConfigPath("/usr/local/etc/pawon-warga")
+		viper.AddConfigPath("/etc/pawon-warga")
+		viper.SetConfigName("pawon-warga")
+	}
+
+	viper.AutomaticEnv() // read in environment variables that match
+
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+}
+
+func InitApp() {
+	config, err := config.NewAppConfig()
+	if err != nil {
+		log.Fatalf("Config error : %s", err)
+	}
+
+	metric.RegisterMetric()
+
+	cache, err := driver.NewCache(config.GetCacheOption())
+	if err != nil {
+		log.Fatalf("%s : %v", "Cache error", err)
+	}
+
+	db, err := driver.NewMysqlDatabase(config.GetDBOption())
+	if err != nil {
+		log.Fatalf("%s : %v", "DB error", err)
+		panic(err)
+	}
+	defer db.Close()
+
+	stdOutLogger := log.New()
+	stdOutLogger.SetOutput(os.Stdout)
+	stdOutLogger.SetLevel(log.DebugLevel)
+
+	stdErrLogger := log.New()
+	stdErrLogger.SetOutput(os.Stderr)
+	stdOutLogger.SetReportCaller(true)
+	stdErrLogger.SetLevel(log.DebugLevel)
+
+	logger := common.NewAPILogger(stdOutLogger, stdErrLogger)
+
+	repo := WiringUpRepository(db, cache, logger, config)
+
+	handler.BaseURL = config.Link.BaseURL
+	common.ImageURL = config.Imagine.ImageEndpoint
+	common.ImgixURL = config.Imgix.ImageEndpoint
+	common.SantetBaseURL = config.Santet.BaseURL
+	common.SantetBasicAuthToggle = config.Santet.BasicAuthToggle
+	common.SantetUsername = config.Santet.BasicAuthUsername
+	common.SantetPassword = config.Santet.BasicAuthPassword
+	common.WhatsappBaseURL = config.Otp.VerifyNumberURL
+
+	service, err := WiringUpServiceV3(repo, db, cache, logger, config)
+	if err != nil {
+		panic(err)
+	}
+
+	middleware, err := middleware.NewMiddlewareBuilder().
+		SetJwtSignKey(config.GetJWTConfig().SignKey).
+		SetHmacConfig(config.HmacSignature).
+		SetKtbsHeaderConfig(config.KtbsHeader).
+		SetTokenService(service.Token).
+		SetUserService(service.User).
+		SetOTPService(service.OTP).
+		Build()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	urlHandler := handler.NewHandler(service, config.GetJWTConfig().SignKey, logger)
+	urlHandlerV3 := v3Handler.NewHandlerV3(v3Service)
+	metricMiddleware := metricMdlwr.New(metricMdlwr.Config{
+		Recorder: metrics.NewRecorder(metrics.Config{}),
+	})
+
+	r := mux.NewRouter()
+
+	r.Use(middleware.CommonHeaderMiddleware)
+	r.Handle("/login", handler.HttpHandler{logger, urlHandler.Login}).Methods(http.MethodPost)
+	r.Handle("/user/registration", handler.HttpHandler{logger, urlHandler.Register}).Methods(http.MethodPost)
+	r.Handle("/user/registration/temp", handler.HttpHandler{logger, urlHandler.RegisterTemp}).Methods(http.MethodPost)
+	r.Handle("/user/registration/temp/{username}", handler.HttpHandler{logger, urlHandler.GetRegisterTemp}).Methods(http.MethodGet)
+	r.Handle("/activation/{user_id}/{activation_key}", handler.HttpHandler{logger, urlHandler.ActivateUser}).Methods(http.MethodGet)
+	r.Handle("/user/registration/otp/{number}", handler.HttpHandler{logger, urlHandler.SendOTP}).Methods(http.MethodGet)
+	r.Handle("/user/registration/otp", handler.HttpHandler{logger, urlHandler.ValidateOTP}).Methods(http.MethodPost)
+	r.Handle("/user/reset-password/otp", handler.HttpHandler{logger, urlHandler.ValidateOTPUpdatePassword}).Methods(http.MethodPost)
+	r.Handle("/user/registration/otp/check", handler.HttpHandler{logger, urlHandler.ValidateWhatsappNumber}).Methods(http.MethodGet)
+	r.Handle("/user/update/password", handler.HttpHandler{logger, urlHandler.UpdatePassword}).Methods(http.MethodPost)
+	r.Handle("/user/reset_password/{user_email}", handler.HttpHandler{logger, urlHandler.ResetPasswordRequest}).Methods(http.MethodGet)
+	r.Handle("/user/reset_password/email", handler.HttpHandler{logger, urlHandler.ResetPasswordByEmail}).Methods(http.MethodPost)
+	r.Handle("/token/validate", handler.HttpHandler{logger, urlHandler.ValidateTokenHandler}).Methods(http.MethodPost)
+
+	nonLoginDonationNegroni := negroni.New(
+		negroni.NewRecovery(),
+		negroni.NewLogger(),
+		negroni.HandlerFunc(middleware.NonLoginMiddleware),
+	)
+
+	nonLoginDonationRouter := mux.NewRouter()
+	nonLoginDonationRouter.Handle("/donations/create_multiple", handler.HttpHandler{logger, urlHandler.CreateDonationMultiple}).Methods(http.MethodPost)
+
+	r.Path("/donations/create_multiple").Handler(nonLoginDonationNegroni.With(
+		negroni.Wrap(nonLoginDonationRouter),
+	))
+
+	withAuthRouter := mux.NewRouter()
+
+	commonNegroni := negroni.New(
+		negroni.NewRecovery(),
+		negroni.NewLogger(),
+		negroni.HandlerFunc(middleware.JWTMiddleware),
+	)
+
+	cors := cors.New(cors.Options{
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+		AllowCredentials: true,
+		AllowedHeaders:   []string{"Authorization", "Content-Type", "Version"},
+	})
+
+	r.Handle("/metrics", promhttp.Handler()).Methods(http.MethodGet)
+
+	KtbsHeaderNegroni := negroni.New(
+		negroni.NewRecovery(),
+		negroni.NewLogger(),
+		negroni.HandlerFunc(middleware.KtbsHeader),
+		negroni.HandlerFunc(middleware.HmacSignature),
+	)
+
+	// V3 endpoints
+	v3Route := r.PathPrefix("/v3").Subrouter()
+	v3Route.Handle("/user/reset_password/otp/{number}", handler.HttpHandler{logger, urlHandlerV3.ResetPasswordRequestOTP}).Methods(http.MethodGet)
+	v3Route.Handle("/user/registration/otp/{number}", handler.HttpHandler{logger, urlHandlerV3.SendOTP}).Methods(http.MethodGet)
+	v3Route.Handle("/user/registration/temp", handler.HttpHandler{logger, urlHandlerV3.RegisterTemp}).Methods(http.MethodPost)
+
+	n := negroni.Classic()
+
+	n.Use(cors)
+	n.UseHandler(r)
+	n.Use(negronimiddleware.Handler("/metrics", metricMiddleware))
+
+	var srv http.Server
+	idleConnsClosed := make(chan struct{})
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt)
+		<-sigint
+
+		stdOutLogger.Printf("Server shutdown.. \n")
+		// We received an interrupt signal, shut down.
+		if err := srv.Shutdown(context.Background()); err != nil {
+			// Error from closing listeners, or context timeout:
+			stdErrLogger.Printf("HTTP server Shutdown: %v", err)
+		}
+		close(idleConnsClosed)
+	}()
+
+	srv.Addr = fmt.Sprintf("%s:%d", config.App.Host, config.App.Port)
+	srv.Handler = n
+	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		// Error starting or closing listener:
+		stdErrLogger.Printf("HTTP server ListenAndServe: %v", err)
+	}
+
+	<-idleConnsClosed
+	stdOutLogger.Printf("Bye. \n")
+}
+
+// WiringUpRepositoryV3 will bootstrapping repository V3
+func WiringUpRepository(db *gorm.DB, cache *redis.Pool, logger *common.APILogger, appConfig *config.Config) *v3Repository.RepositoryV3 {
+	v3RepoOptions := v3Repository.RepositoryV3Option{
+		DB:        db,
+		Cache:     cache,
+		Logger:    logger,
+		AppConfig: appConfig,
+	}
+
+	otpRepoV3 := v3Repository.NewOTPRepository(v3RepoOptions)
+
+	repo := v3Repository.NewRepositoryV3()
+	repo.SetOTPRepository(otpRepoV3)
+
+	return repo
+}
+
+// WiringUpServiceV3 will bootstrapping service V3
+func WiringUpService(v3Repo *v3Repository.RepositoryV3, v2Repo *v2Repository.RepositoryV2, v1Repo *repository.Repository, db *gorm.DB, cache *redis.Pool, logger *common.APILogger, appConfig *config.Config) (*v3Service.ServiceV3, error) {
+	serviceOptionV2 := v2Service.ServiceV2Option{
+		DB:        db,
+		Logger:    logger,
+		Cache:     cache,
+		AppConfig: appConfig,
+	}
+
+	serviceOptionV3 := v3Service.ServiceV3Option{
+		DB:        db,
+		Logger:    logger,
+		Cache:     cache,
+		AppConfig: appConfig,
+	}
+
+	otpServiceV2, err := v2Service.NewOTPV2ServiceBuilder(serviceOptionV2).
+		SetPartnerRepository(v2Repo.OTP).
+		Build()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	otpServiceV3, err := v3Service.NewOTPV3ServiceBuilder(serviceOptionV3).
+		SetPartnerRepository(v3Repo.OTP).
+		Build()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	userServiceV2, err := v2Service.NewUserServiceV2Builder(serviceOptionV2).
+		SetOTPV2Service(otpServiceV2).
+		SetTokenRepository(v1Repo.Token).
+		SetUserRepository(v1Repo.User).
+		Build()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	userService, err := v3Service.NewUserServiceV3Builder(serviceOptionV3).
+		SetUserV2Service(userServiceV2).
+		SetOTPV2Service(otpServiceV2).
+		SetOTPV3Service(otpServiceV3).
+		Build()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	serviceV3 := &v3Service.ServiceV3{
+		OTP:  otpServiceV3,
+		User: userService,
+	}
+
+	return serviceV3, nil
 }
