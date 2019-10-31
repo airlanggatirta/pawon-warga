@@ -12,3 +12,6 @@
 *.out
 bin
 vendor
+
+# Config files
+.pawon-warga.toml

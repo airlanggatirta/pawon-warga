@@ -107,7 +107,7 @@ func NewHandler(service *service.Service, signKey string, logger *common.APILogg
 	return &Handler{
 		Service:    service,
 		JWTSignKey: signKey,
-		Logger: logger,
+		Logger:     logger,
 	}
 }
 

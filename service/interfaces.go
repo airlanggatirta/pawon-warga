@@ -1,5 +1,9 @@
 package service
 
+import (
+	"github.com/airlanggatirta/pawon-warga/model"
+)
+
 type IUserService interface {
 	GetAllUsers() ([]model.User, error)
 	GetOneUser(id uint64) (model.User, error)
@@ -21,4 +25,6 @@ type IUserService interface {
 	SearchUser(keyword string, pageToken string, campaignerOnly bool) (users []model.User, nextToken string, err error)
 	GetOneUserByEmailWithoutFilter(email string) (user model.User, err error)
 	GetOneUserByWhatsappWithoutFilter(waNumber string) (user model.User, err error)
+	IsUserExists(username string) (exists bool, err error)
+	SendActivationEmail(user model.User, emailAddress string) error
 }

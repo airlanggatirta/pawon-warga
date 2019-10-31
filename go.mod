@@ -12,17 +12,20 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.7.3
 	github.com/jinzhu/gorm v1.9.11
+	github.com/kitabisa/perkakas/v2 v2.5.1
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/prometheus/client_golang v0.9.3
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.4.2
+	github.com/slok/go-http-metrics v0.4.0
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.4.0
 	github.com/stretchr/testify v1.4.0
 	github.com/urfave/negroni v1.0.0
 	golang.org/x/text v0.3.2
+	gopkg.in/asaskevich/govalidator.v4 v4.0.0-20160518190739-766470278477
 	gopkg.in/go-playground/validator.v9 v9.30.0
 )
 

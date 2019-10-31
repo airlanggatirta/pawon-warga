@@ -384,8 +384,8 @@ func (c *Config) GetCacheOption() driver.CacheOption {
 	}
 }
 
-func (c *Config) GetJWTConfig() JWT {
-	return JWT{
+func (c *Config) GetJWTConfig() Jwt {
+	return Jwt{
 		Issuer:    c.Jwt.Issuer,
 		SecretKey: c.Jwt.SecretKey,
 		SignKey:   c.Jwt.SignKey,

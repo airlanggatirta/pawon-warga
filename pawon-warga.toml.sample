@@ -5,18 +5,18 @@ host = "0.0.0.0"
 port = 8080
 
 [database]
-host = "staging-db.ktbs.com"
+host = "your_database_host"
 port = 3306
-username = "dewa"
-password = "m66FsuRgZB4AfKKUP2Ed"
-name = "kitabisa"
+username = "your_database_user"
+password = "your_database_password"
+name = "your_shema_name"
 additional_parameters = "charset=utf8&parseTime=True&loc=Asia%2fJakarta&time_zone=%27%2B07%3A00%27"
 max_open_connection = 280
 max_idle_connection = 20
 connection_max_lifetime = "0s"
 
 [cache]
-host = "staging-redis.ktbs.com"
+host = "your_cache_host"
 port = 6379
 dial_connect_timeout = "5s"
 read_timeout = "5s"
@@ -27,7 +27,7 @@ idle_timeout = "60s"
 wait = true
 max_conn_lifetime = "0s"
 namespace = "1"
-password = ""
+password = "your_cache_password"
 
     [cache.items.session]
     prefix = "session"
@@ -294,12 +294,12 @@ password = ""
     ttl = "15s"
 
 [jwt]
-sign_key = "BMbak0BwP3GgKoxRPVOk"
-secret_key = "dF66ywyYvcOE50vtCqhG"
-issuer = "https://kitabisa.com"
+sign_key = "your_jwt_sign_key"
+secret_key = "your_jwt_secret_key"
+issuer = "jwt_issuer"
 
 [hmac_signature]
-secret_key = "7f0e70463be1528e2ef2931ac9400f47aabd9198ceb553b1c2eedff42934fff4"
+secret_key = "your_hmac_signature"
 
 [ktbs_header]
 exclude_mobile_header_check = ["sekawan"] # these client-name will be excluded from mobile header
@@ -309,7 +309,7 @@ header = "common/files/email/header.html"
 footer = "common/files/email/footer.html"
 
 [firebase]
-credential_path = "kitabisa-staging.json"
+credential_path = "your_credential_path"
 
 [users]
 token_ttl = "20160m"
@@ -324,16 +324,16 @@ activation_key_salt = "salt"
     content = "common/files/email/reset_password_request.html"
 
 [ses]
-region = "us-east-1"
-key = "AKIAJC427LPHEMP5EBKA"
-secret = "ynFALEZ/0k7gWymaj4tL3dOcmgE78NBQKMaDXwYx"
-mail_sender = "support@kitabisa.com"
+region = "your_region"
+key = "your_key"
+secret = "your_secret"
+mail_sender = "sender_email"
 
 [otp]
-host = "https://wa.staging.ktbs.io/v1/messages/hsm"
-verify_number_url = "https://wa.staging.ktbs.io/v1/contacts"
-username = "ktbs_xyz"
-password = "bEWG9207v28ikg9YJxrv6134FXS6Vhc5gH3FLzRE"
+host = "your_otp_host"
+verify_number_url = "your_verify_phone"
+username = "username_otp"
+password = "password_otp"
 
 [otpdisbursement]
 max_retry = 0
@@ -344,16 +344,16 @@ rice_price = 10000
 gold_price = 586927
 
 [customerio]
-site_id = "f2bb1594b6533782949b"
-api_key = "d0f53c4fab90a048559c"
-customer_endpoint = "https://track.customer.io/api/v1/customers"
-customer_id_prefix = "production_"
+site_id = "your_site_id"
+api_key = "your_api_key"
+customer_endpoint = "yout_customer_endpoint"
+customer_id_prefix = "your_customer_id_prefix"
 
 [sns]
-key= "AKIAIQF37AVRWAICIYMQ"
-secret= "9BqgUijj2rQazVTfROiC3ZNN/Ezb8XP7KE7sr8zl"
-region= "ap-southeast-1"
-sns_sms_service_topic_arn= "arn:aws:sns:ap-southeast-1:922910427931:notif-sms-test"
+key= "your_sns_key"
+secret= "your_sns_secret"
+region= "your_sns_region"
+sns_sms_service_topic_arn= "your_topic_arn"
 
 [donations]
     [donations.campaigner_notification_get_donation]
@@ -367,10 +367,10 @@ assets_url = "https://assets.kitabisa.com"
 new_assets_url = "https://assets.kitabisa.cc"
 
 [sangu]
-sangu_base_url = "https://sangu.ktbs.xyz"
-sangu_username = "super"
-sangu_password = "superLah"
-sangu_get_token_endpoint = "oauth/token?grant_type=client_credentials"
+sangu_base_url = "sangu_host"
+sangu_username = "sangu_username"
+sangu_password = "sangu_password"
+sangu_get_token_endpoint = "sangu_token_endpoint"
 sangu_create_trx_endpoint = "va/create"
 
     [sangu.jenius]
@@ -397,28 +397,28 @@ sangu_create_trx_endpoint = "va/create"
     minimum_amount=100
 
 [cloudsearch]
-region = "ap-southeast-1"
-search_endpoint = "search-kitabisadev-cdknphoqcqeoq4yoihlt6bz3b4.ap-southeast-1.cloudsearch.amazonaws.com"
-key = "AKIAIQF37AVRWAICIYMQ"
-secret = "9BqgUijj2rQazVTfROiC3ZNN/Ezb8XP7KE7sr8zl"
+region = "your_cloudsearch_region"
+search_endpoint = "your_search_endpoint"
+key = "your_cloudsearch_key"
+secret = "your_cloudsearch_secret"
 
 [midtrans]
-server_key = "SB-Mid-server-2CY_Jz8l6TYo1mA3wmgDJvqq"
-client_key = "SB-Mid-client-_2k7rj-HJVkz7Nm1"
+server_key = "midtrans_server_key"
+client_key = "midtrans_client_key"
 env_type = "sandbox"
-deeplink_donation = "ktbs://donation/summary"
-deeplink_zakat = "ktbs://zakat/summary"
+deeplink_donation = "your_deeplink_donation"
+deeplink_zakat = "your_deeplink_zakat"
 donate_base_url = "https://donate.kitabisa.com"
 
 [clevertap]
 base_url = "https://api.clevertap.com"
-account_id = "TEST-RK8-869-R55Z"
-passcode = "EHE-KIV-MPKL"
+account_id = "clevertap_account_id"
+passcode = "clevertap_passcode"
 
 [imagine]
 base_url = "http://staging.ktbs.io:8087/v1/images/"
-username = "staging"
-password = "gnigats"
+username = "imagine_username"
+password = "imagine_password"
 image_endpoint = "https://img.staging.kitabisa.cc"
 
 [imgix]
@@ -427,13 +427,13 @@ image_endpoint = "https://imgix.kitabisa.xyz"
 [santet]
 base_url = "http://santet.ktbs.xyz"
 basic_auth_toggle = true
-basic_auth_username = "68747470733A2F2F73616E7465742E6B7462732E78797A7764E1AC4A5973616F1A5190AEBB0450"
-basic_auth_password = "68747470733A2F2F73616E7465742E6B7462732E78797A851C4317000348A22C005EA64F09AEBA"
+basic_auth_username = "santet_auth_username"
+basic_auth_password = "santet_auth_password"
 
 [urunan]
 base_url = "http://bisasehat.ktbs.xyz"
 toggle = true
 app_id = "urunan"
-key = "2j4h8hd8467d210ew28732ghwy8236ewb328refg843g8bdeb8h9ehx"
-campaign_id = "115501"
-trx_type = "kitabisa"
+key = "urunan_key"
+campaign_id = "urunan_campaign_id"
+trx_type = "urunan_transaction_type"

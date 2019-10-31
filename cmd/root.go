@@ -7,13 +7,24 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/airlanggatirta/pawon-warga/common"
+	"github.com/airlanggatirta/pawon-warga/config"
+	"github.com/airlanggatirta/pawon-warga/driver"
+	"github.com/airlanggatirta/pawon-warga/handler"
+	"github.com/airlanggatirta/pawon-warga/metric"
+	"github.com/airlanggatirta/pawon-warga/middleware"
+	"github.com/airlanggatirta/pawon-warga/repository"
+	"github.com/airlanggatirta/pawon-warga/service"
 	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
-	"github.com/airlanggatirta/pawon-warga/common"
-	"github.com/mitchellh/go-homedir"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
+	log "github.com/sirupsen/logrus"
+	metrics "github.com/slok/go-http-metrics/metrics/prometheus"
+	metricMdlwr "github.com/slok/go-http-metrics/middleware"
+	negronimiddleware "github.com/slok/go-http-metrics/middleware/negroni"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/urfave/negroni"
@@ -266,57 +277,24 @@ func WiringUpRepository(db *gorm.DB, cache *redis.Pool, logger *common.APILogger
 }
 
 // WiringUpServiceV3 will bootstrapping service V3
-func WiringUpService(v3Repo *v3Repository.RepositoryV3, v2Repo *v2Repository.RepositoryV2, v1Repo *repository.Repository, db *gorm.DB, cache *redis.Pool, logger *common.APILogger, appConfig *config.Config) (*v3Service.ServiceV3, error) {
-	serviceOptionV2 := v2Service.ServiceV2Option{
+func WiringUpService(repo *repository.Repository, db *gorm.DB, cache *redis.Pool, logger *common.APILogger, appConfig *config.Config) (*service.Service, error) {
+
+	serviceOption := service.ServiceOption{
 		DB:        db,
 		Logger:    logger,
 		Cache:     cache,
 		AppConfig: appConfig,
 	}
 
-	serviceOptionV3 := v3Service.ServiceV3Option{
-		DB:        db,
-		Logger:    logger,
-		Cache:     cache,
-		AppConfig: appConfig,
-	}
-
-	otpServiceV2, err := v2Service.NewOTPV2ServiceBuilder(serviceOptionV2).
-		SetPartnerRepository(v2Repo.OTP).
+	/* userService, err := service.NewUserServiceBuilder(serviceOption).
 		Build()
 	if err != nil {
 		log.Fatalln(err)
+	} */
+
+	service := &service.Service{
+		//User: userService,
 	}
 
-	otpServiceV3, err := v3Service.NewOTPV3ServiceBuilder(serviceOptionV3).
-		SetPartnerRepository(v3Repo.OTP).
-		Build()
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	userServiceV2, err := v2Service.NewUserServiceV2Builder(serviceOptionV2).
-		SetOTPV2Service(otpServiceV2).
-		SetTokenRepository(v1Repo.Token).
-		SetUserRepository(v1Repo.User).
-		Build()
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	userService, err := v3Service.NewUserServiceV3Builder(serviceOptionV3).
-		SetUserV2Service(userServiceV2).
-		SetOTPV2Service(otpServiceV2).
-		SetOTPV3Service(otpServiceV3).
-		Build()
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	serviceV3 := &v3Service.ServiceV3{
-		OTP:  otpServiceV3,
-		User: userService,
-	}
-
-	return serviceV3, nil
+	return service, nil
 }
