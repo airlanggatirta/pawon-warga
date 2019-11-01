@@ -1,17 +1,17 @@
 package middleware
 
 import (
-	"github.com/airlanggatirta/pawon-warga/handler"
 	"context"
 	"encoding/json"
-	"github.com/airlanggatirta/pawon-warga/metric"
+	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/gomodule/redigo/redis"
+	"github.com/airlanggatirta/pawon-warga/handler"
+	"github.com/airlanggatirta/pawon-warga/metric"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/airlanggatirta/pawon-warga/common"
+	jwt "github.com/dgrijalva/jwt-go"
 
 	"github.com/airlanggatirta/pawon-warga/model"
 )
@@ -22,7 +22,7 @@ func (m *Middleware) JWTMiddleware(w http.ResponseWriter, r *http.Request, next 
 	if auth == "" {
 		statusError := handler.StatusError{
 			Code: http.StatusUnauthorized,
-			Err: err,
+			Err:  err,
 		}
 		handler.WriteErrorResponse(w, statusError)
 		return
@@ -32,7 +32,7 @@ func (m *Middleware) JWTMiddleware(w http.ResponseWriter, r *http.Request, next 
 	if len(authToken) != 2 {
 		statusError := handler.StatusError{
 			Code: http.StatusUnauthorized,
-			Err: err,
+			Err:  err,
 		}
 		handler.WriteErrorResponse(w, statusError)
 		return
@@ -45,19 +45,20 @@ func (m *Middleware) JWTMiddleware(w http.ResponseWriter, r *http.Request, next 
 		err = common.ErrInvalidToken
 		statusError := handler.StatusError{
 			Code: http.StatusUnauthorized,
-			Err: err,
+			Err:  err,
 		}
 		handler.WriteErrorResponse(w, statusError)
 		return
 	}
 
-	decryptedToken, err := m.TokenService.DecryptToken(tokenValue)
+	//decryptedToken, err := m.TokenService.DecryptToken(tokenValue)
+	decryptedToken, err := common.Decrypt(tokenValue, "secret_key")
 	if err != nil {
 		metric.CountJwtTokenInvalid("Fail Decrypt")
 		err = common.ErrInvalidToken
 		statusError := handler.StatusError{
 			Code: http.StatusUnauthorized,
-			Err: err,
+			Err:  err,
 		}
 		handler.WriteErrorResponse(w, statusError)
 		return
@@ -71,7 +72,7 @@ func (m *Middleware) JWTMiddleware(w http.ResponseWriter, r *http.Request, next 
 		err = common.ErrInvalidToken
 		statusError := handler.StatusError{
 			Code: http.StatusUnauthorized,
-			Err: err,
+			Err:  err,
 		}
 		handler.WriteErrorResponse(w, statusError)
 		return
@@ -84,7 +85,7 @@ func (m *Middleware) JWTMiddleware(w http.ResponseWriter, r *http.Request, next 
 		err = common.ErrInvalidToken
 		statusError := handler.StatusError{
 			Code: http.StatusUnauthorized,
-			Err: err,
+			Err:  err,
 		}
 		handler.WriteErrorResponse(w, statusError)
 		return
@@ -105,7 +106,7 @@ func (m *Middleware) JWTMiddleware(w http.ResponseWriter, r *http.Request, next 
 			err = common.ErrInvalidToken
 			statusError := handler.StatusError{
 				Code: http.StatusUnauthorized,
-				Err: err,
+				Err:  err,
 			}
 			handler.WriteErrorResponse(w, statusError)
 			return
@@ -123,7 +124,7 @@ func (m *Middleware) JWTMiddleware(w http.ResponseWriter, r *http.Request, next 
 			err = common.ErrInvalidToken
 			statusError := handler.StatusError{
 				Code: http.StatusUnauthorized,
-				Err: err,
+				Err:  err,
 			}
 			handler.WriteErrorResponse(w, statusError)
 			return
@@ -133,40 +134,42 @@ func (m *Middleware) JWTMiddleware(w http.ResponseWriter, r *http.Request, next 
 	ctx := r.Context()
 	if claims, ok := token.Claims.(*model.NewKitabisaClaims); ok && token.Valid {
 		userID := claims.UserID
-		_, err := m.TokenService.GetToken(userID)
+		fmt.Println(userID)
+		/* _, err := m.TokenService.GetToken(userID)
 		if err != nil {
 			if err == redis.ErrNil {
 				err = common.ErrSessionExpired
 			}
 			statusError := handler.StatusError{
 				Code: http.StatusUnauthorized,
-				Err: err,
+				Err:  err,
 			}
 			handler.WriteErrorResponse(w, statusError)
 			return
-		}
+		} */
 
 		ctx = context.WithValue(ctx, "UserInfo", claims)
 	} else if claims, ok := token.Claims.(*model.KitabisaClaims); ok && token.Valid {
 		userID := claims.User.ID
-		_, err := m.TokenService.GetToken(userID)
+		fmt.Println(userID)
+		/* _, err := m.TokenService.GetToken(userID)
 		if err != nil {
 			if err == redis.ErrNil {
 				err = common.ErrSessionExpired
 			}
 			statusError := handler.StatusError{
 				Code: http.StatusUnauthorized,
-				Err: err,
+				Err:  err,
 			}
 			handler.WriteErrorResponse(w, statusError)
 			return
-		}
+		} */
 
 		ctx = context.WithValue(ctx, "UserInfo", claims.User)
 	} else {
 		statusError := handler.StatusError{
 			Code: http.StatusUnauthorized,
-			Err: err,
+			Err:  err,
 		}
 		handler.WriteErrorResponse(w, statusError)
 		return

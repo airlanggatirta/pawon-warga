@@ -8,12 +8,10 @@ import (
 
 // Builder defines struct builder for middleware
 type Builder struct {
-	JWTSignKey       string                `validate:"required"`
-	HmacConfig       config.HmacSignature  `validate:"required"`
-	KtbsHeaderConfig config.KtbsHeader     `validate:"required"`
-	TokenService     service.ITokenService `validate:"required"`
-	UserService      service.IUserService  `validate:"required"`
-	OTPService       service.IOTPService   `validate:"required"`
+	JWTSignKey       string               `validate:"required"`
+	HmacConfig       config.HmacSignature `validate:"required"`
+	KtbsHeaderConfig config.KtbsHeader    `validate:"required"`
+	UserService      service.IUserService `validate:"required"`
 }
 
 // NewMiddlewareBuilder initializes middleware builder instance
@@ -39,21 +37,9 @@ func (b *Builder) SetKtbsHeaderConfig(cfg config.KtbsHeader) *Builder {
 	return b
 }
 
-// SetTokenService will set token service
-func (b *Builder) SetTokenService(svc service.ITokenService) *Builder {
-	b.TokenService = svc
-	return b
-}
-
 // SetUserService will set user service
 func (b *Builder) SetUserService(svc service.IUserService) *Builder {
 	b.UserService = svc
-	return b
-}
-
-// SetOTPService will set OTP service
-func (b *Builder) SetOTPService(svc service.IOTPService) *Builder {
-	b.OTPService = svc
 	return b
 }
 
@@ -68,8 +54,6 @@ func (b *Builder) Build() (*Middleware, error) {
 		JWTSignKey:       b.JWTSignKey,
 		HmacConfig:       b.HmacConfig,
 		KtbsHeaderConfig: b.KtbsHeaderConfig,
-		TokenService:     b.TokenService,
 		UserService:      b.UserService,
-		OTPService:       b.OTPService,
 	}, nil
 }

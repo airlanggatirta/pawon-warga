@@ -24,6 +24,7 @@ require (
 	github.com/spf13/viper v1.4.0
 	github.com/stretchr/testify v1.4.0
 	github.com/urfave/negroni v1.0.0
+	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
 	golang.org/x/text v0.3.2
 	gopkg.in/asaskevich/govalidator.v4 v4.0.0-20160518190739-766470278477
 	gopkg.in/go-playground/validator.v9 v9.30.0

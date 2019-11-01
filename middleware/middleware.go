@@ -10,7 +10,5 @@ type Middleware struct {
 	JWTSignKey       string
 	HmacConfig       config.HmacSignature
 	KtbsHeaderConfig config.KtbsHeader
-	TokenService     service.ITokenService
 	UserService      service.IUserService
-	OTPService       service.IOTPService
 }

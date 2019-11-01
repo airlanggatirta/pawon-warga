@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -192,6 +193,7 @@ func WriteErrorResponse(w http.ResponseWriter, err StatusError) {
 
 func (h *Handler) ParseUserFromContext(ctx context.Context) (user model.User, err error) {
 	var userID uint64
+	fmt.Println(userID)
 	claims, ok := ctx.Value("UserInfo").(*model.NewKitabisaClaims)
 	if !ok {
 		userInfo, _ := ctx.Value("UserInfo").(model.User)
@@ -200,5 +202,5 @@ func (h *Handler) ParseUserFromContext(ctx context.Context) (user model.User, er
 		userID = claims.UserID
 	}
 
-	return h.Service.User.GetUserByID(userID)
+	return
 }
